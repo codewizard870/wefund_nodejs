@@ -186,7 +186,12 @@ app.post("/uploadWhitepaper", async function (req, res) {
     source.on('error', function(err) { console.log("move error") });
   });
 });
-
+app.post("/", function(req, res){
+  res.json({
+    status: "success",
+    data: "okay",
+  });
+})
 const port = 3001;
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
