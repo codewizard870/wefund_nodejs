@@ -1,3 +1,7 @@
+// const express = require('express')
+// const app = express()
+const port = process.env.PORT || 3000
+
 const { PDFDocument,StandardFonts,rgb,degrees } =  require('pdf-lib');
 const nodemailer = require("nodemailer");
 const express = require("express");
@@ -187,7 +191,11 @@ app.post("/uploadWhitepaper", async function (req, res) {
   });
 });
 
-const port = 3001;
-app.listen(port, () => {
-  console.log(`Server is running on port: ${port}`);
-});
+// const port = 3001;
+// app.listen(port, () => {
+//   console.log(`Server is running on port: ${port}`);
+// });
+
+app.get('/', (req, res) => res.send("success"))
+
+app.listen(port, () => console.log(`Server listening on port ${port}!`))
