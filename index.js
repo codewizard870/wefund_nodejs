@@ -1,6 +1,6 @@
 // const express = require('express')
 // const app = express()
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3001
 
 const { PDFDocument,StandardFonts,rgb,degrees } =  require('pdf-lib');
 const nodemailer = require("nodemailer");
@@ -8,6 +8,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const fs = require('fs');
+const path = require("path")
 var formidable = require('formidable');
 
 // middleware
@@ -189,6 +190,22 @@ app.post("/uploadWhitepaper", async function (req, res) {
     });
     source.on('error', function(err) { console.log("move error") });
   });
+});
+
+app.get("/download_pdf", (req, res) => {
+  const file = req.query.filename;
+
+  var filePath = path.join(__dirname, `PDF/${file}`);
+  console.log(filePath);
+  res.download(filePath);
+});
+
+app.get("/download", (req, res) => {
+  const file = req.query.filename;
+
+  var filePath = path.join(__dirname, `upload/${file}`);
+  console.log(filePath);
+  res.download(filePath);
 });
 
 // const port = 3001;
