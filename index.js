@@ -182,7 +182,29 @@ app.post("/uploadWhitepaper", async function (req, res) {
     var dest = fs.createWriteStream(newpath);
     
     source.pipe(dest);
-    source.on('end', async function() { 
+    source.on('end', async function() {
+      console.log("whitepaper upload" + newpath);
+      res.json({
+        status: "success",
+        data: newFilename,
+      });
+    });
+    source.on('error', function(err) { console.log("move error") });
+  });
+});
+app.post("/uploadLogo", async function (req, res) {
+  var form = new formidable.IncomingForm();
+  form.parse(req, async function (err, fields, files) {
+    var oldpath = files.file.filepath;
+    var newFilename = fields.projectName + "_logo_" + files.file.originalFilename;
+    let newpath = "upload/" + newFilename;
+
+    var source = fs.createReadStream(oldpath);
+    var dest = fs.createWriteStream(newpath);
+    
+    source.pipe(dest);
+    source.on('end', async function() {
+      console.log("logo upload" + newpath);
       res.json({
         status: "success",
         data: newFilename,
