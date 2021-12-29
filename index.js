@@ -103,17 +103,17 @@ async function embedImages() {
 function SendMail(){
   const htmlEmail = `
     <h3>Contact Details</h3>
-    <h1><a href="${serverPath}${pdfPath}${pdfFile}">Cllick to see your pdf</a></h1>
+    <h1><a href="${serverPath}/download_pdf?filename=${pdfFile}">Cllick to see your pdf</a></h1>
     <h3>Message</h3>
     <p>Testing</p>
     `
   let mailOptions = {
     from: `alenzer0902@gmail.com`,
-    to: "simkin0902@gmail.com",
-    subject: 'Message from: server',
+    to: email,
+    subject: 'Message from: WefundOfficial',
     html: htmlEmail,
     };
-  
+
   let transporter = nodemailer.createTransport({
     // service: "gmail",
     host: 'smtp.gmail.com',
@@ -123,13 +123,16 @@ function SendMail(){
     auth: {
     // type: "OAuth2",
     user: "markovitez090@gmail.com",
-    pass: "12345678",
+    pass: "MarkoVitez090!",
     // clientId: '958471293842-kipnnfth137ajici3iuka6a92ltbn64e.apps.googleusercontent.com',
     // clientSecret: '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',
     // refreshToken: process.env.OAUTH_REFRESH_TOKEN,
     },
     // tls: {rejectUnauthorized: false}
   });   
+
+  console.log(mailOptions);
+
   transporter.sendMail(mailOptions, function (err, data) {
     if (err) {
         console.log(err)
@@ -150,25 +153,22 @@ app.post("/pdfmake", async function (req, res) {
     email = fields.investEmail;
     date = fields.investDate;
 
-    var oldpath = files.file.filepath;
-    signFile = "upload/" + files.file.originalFilename;
+    const sign = fields.investSignature;
 
-    var source = fs.createReadStream(oldpath);
-    var dest = fs.createWriteStream(signFile);
-    
-    source.pipe(dest);
-    source.on('end', async function() { 
-      await embedImages();
-      console.log("Create pdf file:"+pdfFile);
-      // console.log("Sending email");
-        // SendMail();
+    let buff = Buffer.from(sign.substr(22), 'base64');
+    signFile = "upload/" + name + "_sign.png";
+    fs.writeFileSync(signFile, buff);
+
+    await embedImages();
+    console.log("Create pdf file:"+pdfFile);
+
+    console.log("Sending email");
+    SendMail();
       
-      res.json({
-        status: "success",
-        data: pdfFile,
-      });
+    res.json({
+      status: "success",
+      data: pdfFile,
     });
-    source.on('error', function(err) { console.log("move error") });
   });
 });
 app.post("/uploadWhitepaper", async function (req, res) {
