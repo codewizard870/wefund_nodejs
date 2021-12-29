@@ -122,8 +122,8 @@ function SendMail(){
     requireTLS: true,
     auth: {
     // type: "OAuth2",
-    user: "markovitez090@gmail.com",
-    pass: "MarkoVitez090!",
+    user: "jameszook0902@gmail.com",
+    pass: "ypsecskymkiccmxa",
     // clientId: '958471293842-kipnnfth137ajici3iuka6a92ltbn64e.apps.googleusercontent.com',
     // clientSecret: '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',
     // refreshToken: process.env.OAUTH_REFRESH_TOKEN,
