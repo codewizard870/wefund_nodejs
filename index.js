@@ -1,5 +1,3 @@
-// const express = require('express')
-// const app = express()
 const port = process.env.PORT || 3001
 
 const { PDFDocument,StandardFonts,rgb,degrees } =  require('pdf-lib');
@@ -132,40 +130,55 @@ function SendMail(){
   //   // tls: {rejectUnauthorized: false}
   // });
 
-  let transporter = nodemailer.createTransport({
-//name: "example.com",
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // use TLS
-    auth: {
-      user: "markovitez090@gmail.com",
-      pass: "MarkoVitez090!",
-    },
-    tls: {
-      // do not fail on invalid certs
-      rejectUnauthorized: false,
-    },
-  });
+//   let transporter = nodemailer.createTransport({
+// //name: "example.com",
+//     host: "smtp.gmail.com",
+//     port: 587,
+//     secure: false, // use TLS
+//     auth: {
+//       user: "markovitez090@gmail.com",
+//       pass: "MarkoVitez090!",
+//     },
+//     tls: {
+//       // do not fail on invalid certs
+//       rejectUnauthorized: false,
+//     },
+//   });
 
-transporter.verify(function (error, success) {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log("Server is ready to take our messages");
-  }
-});
+// transporter.verify(function (error, success) {
+//   if (error) {
+//     console.log(error);
+//   } else {
+//     console.log("Server is ready to take our messages");
+//   }
+// });
 
-  console.log(mailOptions);
+//   console.log(mailOptions);
 
-  transporter.sendMail(mailOptions, function (err, data) {
-    if (err) {
-        console.log(err)
-        return false;
-    } else {
-        console.log("== Message Sent ==");
-        return true;
-    }
-  });
+//   transporter.sendMail(mailOptions, function (err, data) {
+//     if (err) {
+//         console.log(err)
+//         return false;
+//     } else {
+//         console.log("== Message Sent ==");
+//         return true;
+//     }
+//   });
+
+  const apiKey = 'cac494aa-8e59be49';
+  const domain = 'mailer.wefund.app';
+
+  const mailgun = require('mailgun-js')({ domain, apiKey });
+
+  mailgun.messages().
+    send({
+      from: `wefundofficial@gmail.com`,
+        to: 'alenzer0902@gmail.com',
+        subject: 'Hello from Mailgun',
+        text: 'This is a test'
+    })
+    .then(res => console.log(res))
+    .catch(err => console.log(err));
 }
 
 app.post("/pdfmake", async function (req, res) {
@@ -186,8 +199,8 @@ app.post("/pdfmake", async function (req, res) {
     await embedImages();
     console.log("Create pdf file:"+pdfFile);
 
-    console.log("Sending email");
-    SendMail();
+    // console.log("Sending email");
+    // SendMail();
       
     res.json({
       status: "success",
