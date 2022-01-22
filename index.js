@@ -170,8 +170,8 @@ function SendMail(){
 
   const mailgun = require('mailgun-js')({ domain, apiKey });
 
-  mailgun.messages().
-    send({
+  mailgun.messages()
+    .send({
       from: `wefundofficial@gmail.com`,
         to: 'alenzer0902@gmail.com',
         subject: 'Hello from Mailgun',
@@ -267,6 +267,47 @@ app.get("/download", (req, res) => {
   res.download(filePath);
 });
 
+app.post("/checkreferral", (req,res) => {
+  var form = new formidable.IncomingForm();
+  form.parse(req, async function (err, fields, files) {
+    var mysql = require('mysql');
+
+    var con = mysql.createConnection({
+      host: "db-mysql-sgp1-60871-do-user-10243971-0.b.db.ondigitalocean.com",
+      port: 25060,
+      user: "doadmin",
+      password: "i262IiKD7u6j46NT",
+      database: "WEFUND"
+    });
+
+    con.connect(async function(err) {
+      if (err) throw err;
+console.log("Connected!");
+
+      var sql = "Select * from Referral where base='" + fields.base + "' and referred='" + fields.referred + "'";
+      con.query(sql, async function (err, result) {
+        if (result.length == 0){
+          sql = "INSERT INTO Referral (base, referred) VALUES ('" + fields.base + "', '" +
+            fields.referred + "')";
+          await con.query(sql, function (err, result) {
+          });
+        }
+        sql = "Select count(base) as referralCount from Referral where base='" + fields.base + "'";
+        con.query(sql, function(err, result){
+          if (err){
+            res.json({ status: "success", data: '0'});
+            return;
+          }
+
+          res.json({
+            status: "success",
+            data: result[0].referralCount,
+          });
+        })
+      });
+    });
+  });
+})
 // const port = 3001;
 // app.listen(port, () => {
 //   console.log(`Server is running on port: ${port}`);
