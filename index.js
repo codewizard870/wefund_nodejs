@@ -284,27 +284,39 @@ app.post("/checkreferral", (req,res) => {
       if (err) throw err;
 console.log("Connected!");
 
-      var sql = "Select * from Referral where base='" + fields.base + "' and referred='" + fields.referred + "'";
-      con.query(sql, async function (err, result) {
-        if (result.length == 0){
-          sql = "INSERT INTO Referral (base, referred) VALUES ('" + fields.base + "', '" +
-            fields.referred + "')";
-          await con.query(sql, function (err, result) {
-          });
-        }
-        sql = "Select count(base) as referralCount from Referral where base='" + fields.base + "'";
-        con.query(sql, function(err, result){
-          if (err){
-            res.json({ status: "success", data: '0'});
-            return;
-          }
+      if(fields.base != ''){
+        var sql = "Select * from Referral where base='" + fields.base + "' and referred='" + fields.referred + "'";
 
-          res.json({
-            status: "success",
-            data: result[0].referralCount,
-          });
+        await new Promise((res, rej) => {
+          con.query(sql, async function (err, result) {
+            if(err) rej(err)
+            if (result.length == 0){
+              sql = "INSERT INTO Referral (base, referred) VALUES ('" + fields.base + "', '" +
+                fields.referred + "')";
+
+              con.query(sql, function (err, result) {
+                if(err) rej(err)
+                res(result)
+              });
+            }
+            res(result);
+          })
         })
-      });
+      }
+
+      sql = "Select count(base) as referralCount from Referral where base='" + fields.referred + "'";
+
+      con.query(sql, function(err, result){
+        if (err){
+          res.json({ status: "success", data: '0'});
+          return;
+        }
+
+        res.json({
+          status: "success",
+          data: result[0].referralCount,
+        });
+      })
     });
   });
 })
