@@ -19,14 +19,13 @@ let signFile;
 let pdfPath = "PDF/";
 let serverPath = "https://wefund-nodejs-hmcl7.ondigitalocean.app";
 
-async function embedImages() {
+async function embedImages(presale) {
 
-  const url = 'PDFTemplate.pdf';
+  const url = presale == "true"? 'PDFTemplate_presale.pdf':'PDFTemplate.pdf';
   let existingPdfBytes = fs.readFileSync(url);
-
+console.log(url);
   //const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer())
   //const existingPdfBytes = await fs.read();
-  console.log(existingPdfBytes.length);
   
   const pdfDoc = await PDFDocument.load(existingPdfBytes)
   const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
@@ -34,8 +33,6 @@ async function embedImages() {
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
   const { width, height } = firstPage.getSize()
-  console.log("width:"+width);
-  console.log("height:"+height);
 
   firstPage.drawText(amount, {
     x: 167,
@@ -189,6 +186,7 @@ app.post("/pdfmake", async function (req, res) {
     title = fields.investTitle;
     email = fields.investEmail;
     date = fields.investDate;
+    presale = fields.presale;
 
     const sign = fields.investSignature;
 
@@ -196,7 +194,7 @@ app.post("/pdfmake", async function (req, res) {
     signFile = "upload/" + name + "_sign.png";
     fs.writeFileSync(signFile, buff);
 
-    await embedImages();
+    await embedImages(presale);
     console.log("Create pdf file:"+pdfFile);
 
     // console.log("Sending email");
@@ -281,7 +279,7 @@ app.post("/checkreferral", (req,res) => {
     });
 
     con.connect(async function(err) {
-      if (err) throw err;
+      if (!err){
 console.log("Connected!");
 
       if(fields.base != ''){
@@ -317,6 +315,7 @@ console.log("Connected!");
           data: result[0].referralCount,
         });
       })
+    }
     });
   });
 })
