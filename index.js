@@ -206,6 +206,71 @@ app.post("/pdfmake", async function (req, res) {
     });
   });
 });
+
+async function editDocx()
+{
+  const PizZip = require("pizzip");
+  const Docxtemplater = require("docxtemplater");
+  
+  const fs = require("fs");
+  // const path = require("path");
+  
+  // Load the docx file as binary content
+  const content = fs.readFileSync(
+      "DOCXTemplate.docx",
+      "binary"
+  );
+  
+  const zip = new PizZip(content);
+  
+  const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true,
+  });
+  
+  // Render the document (Replace {first_name} by John, {last_name} by Doe, ...)
+  doc.render({
+      token: "BITCOIN",
+      company: "wefund",
+  });
+  
+  const buf = doc.getZip().generate({
+      type: "nodebuffer",
+      // compression: DEFLATE adds a compression step.
+      // For a 50MB output document, expect 500ms additional CPU time
+      compression: "DEFLATE",
+  });
+  
+  // buf is a nodejs Buffer, you can either write it to a file or res.send it with express for example.
+  fs.writeFileSync("output.docx", buf);
+}
+
+app.post("/docxmake", async function (req, res) {
+  var form = new formidable.IncomingForm();
+  form.parse(req, async function (err, fields, files) {
+    amount = fields.investAmount;
+    name = fields.investName;
+    title = fields.investTitle;
+    email = fields.investEmail;
+    date = fields.investDate;
+    presale = fields.presale;
+
+    const sign = fields.investSignature;
+
+    let buff = Buffer.from(sign.substr(22), 'base64');
+    signFile = "upload/" + name + "_sign.png";
+    fs.writeFileSync(signFile, buff);
+
+    editDocx();
+    console.log("Create word file:"+pdfFile);
+
+    res.json({
+      status: "success",
+      data: pdfFile,
+    });
+  });
+});
+
 app.post("/uploadWhitepaper", async function (req, res) {
   var form = new formidable.IncomingForm();
   form.parse(req, async function (err, fields, files) {
@@ -240,6 +305,27 @@ app.post("/uploadLogo", async function (req, res) {
     source.pipe(dest);
     source.on('end', async function() {
       console.log("logo upload" + newpath);
+      res.json({
+        status: "success",
+        data: newFilename,
+      });
+    });
+    source.on('error', function(err) { console.log("move error") });
+  });
+});
+app.post("/uploadSAFT", async function (req, res) {
+  var form = new formidable.IncomingForm();
+  form.parse(req, async function (err, fields, files) {
+    var oldpath = files.file.filepath;
+    var newFilename = fields.projectName + "_SAFT_" + files.file.originalFilename;
+    let newpath = "upload/" + newFilename;
+
+    var source = fs.createReadStream(oldpath);
+    var dest = fs.createWriteStream(newpath);
+    
+    source.pipe(dest);
+    source.on('end', async function() {
+      console.log("SAFT upload" + newpath);
       res.json({
         status: "success",
         data: newFilename,
