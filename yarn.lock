@@ -718,6 +718,22 @@
   "resolved" "https://registry.npmjs.org/doctypes/-/doctypes-1.1.0.tgz"
   "version" "1.1.0"
 
+"docxtemplater-image-module-free@^1.1.1":
+  "integrity" "sha512-aWOzVQN7ggDYjfoy3pTTNrcrZ7/CJrQcI9cT+hmyHE6nRLR67nt5yPFPe9hm9VWbfYIED2fi+3itOnF0TE/RWQ=="
+  "resolved" "https://registry.npmjs.org/docxtemplater-image-module-free/-/docxtemplater-image-module-free-1.1.1.tgz"
+  "version" "1.1.1"
+  dependencies:
+    "xmldom" "^0.1.27"
+
+"docxtemplater-image-module@^1.0.4":
+  "integrity" "sha1-cwD+r4vOnVdGxZpUmp+7h5a6dLg="
+  "resolved" "https://registry.npmjs.org/docxtemplater-image-module/-/docxtemplater-image-module-1.0.4.tgz"
+  "version" "1.0.4"
+  dependencies:
+    "png-js" "^0.1.1"
+    "qrcode-reader" "^0.2.1"
+    "xmldom" "^0.1.22"
+
 "docxtemplater@^3.28.6":
   "integrity" "sha512-Hc4tiop+zS0XN08gXIfOD2a0/GtD4M4HT8czFoSJz1CEg/jWGyt4yOAVbMWsx57rX1d1U3gWBcf1Ymb93g9D5g=="
   "resolved" "https://registry.npmjs.org/docxtemplater/-/docxtemplater-3.28.6.tgz"
@@ -1202,6 +1218,13 @@
     "is-promise" "^2.0.0"
     "promise" "^7.0.1"
 
+"jszip@^2.6.1":
+  "integrity" "sha1-uI86ey5noqBIFSmCx6N1bZxIKPA="
+  "resolved" "https://registry.npmjs.org/jszip/-/jszip-2.6.1.tgz"
+  "version" "2.6.1"
+  dependencies:
+    "pako" "~1.0.2"
+
 "kind-of@^3.0.2":
   "integrity" "sha1-MeohpzS6ubuw8yRm2JOupR5KPGQ="
   "resolved" "https://registry.npmjs.org/kind-of/-/kind-of-3.2.2.tgz"
@@ -1453,6 +1476,13 @@
   dependencies:
     "wrappy" "1"
 
+"open-docxtemplater-image-module@^1.0.3":
+  "integrity" "sha1-+7ao6G99yulqq0gt9/2XM/uPJlI="
+  "resolved" "https://registry.npmjs.org/open-docxtemplater-image-module/-/open-docxtemplater-image-module-1.0.3.tgz"
+  "version" "1.0.3"
+  dependencies:
+    "xmldom" "^0.1.27"
+
 "optionator@^0.8.1":
   "integrity" "sha512-+IW9pACdk3XWmmTXG8m3upGUJst5XRGzxMRjXzAuJ1XnIFNvfhjjIuYkDvysnPQ7qzqVzLt78BCruntqRhWQbA=="
   "resolved" "https://registry.npmjs.org/optionator/-/optionator-0.8.3.tgz"
@@ -1495,7 +1525,7 @@
   "resolved" "https://registry.npmjs.org/pako/-/pako-0.2.9.tgz"
   "version" "0.2.9"
 
-"pako@^1.0.10", "pako@^1.0.11", "pako@^1.0.6":
+"pako@^1.0.10", "pako@^1.0.11", "pako@^1.0.6", "pako@~1.0.2":
   "integrity" "sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw=="
   "resolved" "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz"
   "version" "1.0.11"
@@ -1558,6 +1588,11 @@
   "version" "3.1.1"
   dependencies:
     "pako" "^2.0.4"
+
+"png-js@^0.1.1":
+  "integrity" "sha1-HMfCEjA6yr50Jj7DrHgAlYAkLZM="
+  "resolved" "https://registry.npmjs.org/png-js/-/png-js-0.1.1.tgz"
+  "version" "0.1.1"
 
 "popmotion@9.3.6":
   "integrity" "sha512-ZTbXiu6zIggXzIliMi8LGxXBF5ST+wkpXGEjeTUDUOCdSQ356hij/xjeUdv0F8zCQNeqB1+PR5/BB+gC+QLAPw=="
@@ -1738,6 +1773,11 @@
     "pug-parser" "^5.0.1"
     "pug-runtime" "^2.0.5"
     "pug-strip-comments" "^1.0.4"
+
+"qrcode-reader@^0.2.1":
+  "integrity" "sha1-HyAvJGHQ7u2F6HlKb0T+QY3af4c="
+  "resolved" "https://registry.npmjs.org/qrcode-reader/-/qrcode-reader-0.2.2.tgz"
+  "version" "0.2.2"
 
 "qs@6.5.2":
   "integrity" "sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA=="
@@ -2180,6 +2220,11 @@
   "integrity" "sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8="
   "resolved" "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"
   "version" "1.0.2"
+
+"xmldom@^0.1.22", "xmldom@^0.1.27":
+  "integrity" "sha512-yS2uJflVQs6n+CyjHoaBmVSqIDevTAWrzMmjG1Gc7h1qQ7uVozNhEPJAwZXWyGQ/Gafo3fCwrcaokezLPupVyQ=="
+  "resolved" "https://registry.npmjs.org/xmldom/-/xmldom-0.1.31.tgz"
+  "version" "0.1.31"
 
 "xregexp@2.0.0":
   "integrity" "sha1-UqY+VsoLhKfzpfPWGHLxJq16WUM="

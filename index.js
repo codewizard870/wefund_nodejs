@@ -13,88 +13,8 @@ var formidable = require('formidable');
 app.use(express.json());
 app.use(cors());
 
-let amount = '', date = '', name = '', title = '' , email = '';
-let pdfFile;
-let signFile;
-let pdfPath = "PDF/";
 let serverPath = "https://wefund-nodejs-hmcl7.ondigitalocean.app";
 
-async function embedImages(presale) {
-
-  const url = presale == "true"? 'PDFTemplate_presale.pdf':'PDFTemplate.pdf';
-  let existingPdfBytes = fs.readFileSync(url);
-console.log(url);
-  //const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer())
-  //const existingPdfBytes = await fs.read();
-  
-  const pdfDoc = await PDFDocument.load(existingPdfBytes)
-  const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
-
-  const pages = pdfDoc.getPages()
-  const firstPage = pages[0]
-  const { width, height } = firstPage.getSize()
-
-  firstPage.drawText(amount, {
-    x: 167,
-    y: 672,
-    size: 12,
-    font: helveticaFont,
-    color: rgb(0, 0, 0)
-  })
-  firstPage.drawText(date, {
-    x: 435,
-    y: 672,
-    size: 10,
-    font: helveticaFont,
-    color: rgb(0, 0, 0)
-  })
-
-  const nextpage = pages[4] //pdfDoc.addPage()
-  nextpage.drawText(name, {
-    x: 366,
-    y: 415,
-    size: 12,
-    font: helveticaFont,
-    color: rgb(0, 0, 0)
-  })
-  nextpage.drawText(title, {
-    x: 366,
-    y: 391,
-    size: 12,
-    font: helveticaFont,
-    color: rgb(0, 0, 0)
-  })
-  nextpage.drawText(email, {
-    x: 366,
-    y: 367,
-    size: 12,
-    font: helveticaFont,
-    color: rgb(0, 0, 0)
-  })
-
-  const signPNG = signFile;
-  let pngImageBytes = fs.readFileSync(signPNG);
-  //const jpgImageBytes = await fetch(jpgUrl).then((res) => res.arrayBuffer())
-  //const pngImageBytes = await fetch(pngUrl).then((res) => res.arrayBuffer())
-  //const pdfDoc = await PDFDocument.create()
-
-  const pngImage = await pdfDoc.embedPng(pngImageBytes)
-  // const pngDims = pngImage.scale(0.5)
-
-  nextpage.drawImage(pngImage, {
-    x: 340,
-    y: 442,
-    width: 150,
-    height: 50,
-  })
-
-  const res = await pdfDoc.save({ dataUri: true });
-
-  pdfFile = name + "_pdf.pdf";
-  console.log("write file:" + pdfPath + pdfFile);
-  fs.writeFileSync(pdfPath + pdfFile, res);
-  return true;
-}
 function SendMail(){
   const htmlEmail = `
     <h3>Contact Details</h3>
@@ -178,28 +98,92 @@ function SendMail(){
     .catch(err => console.log(err));
 }
 
+async function editPDF(fields) {
+
+  const url = fields.presale == "true"? 'PDFTemplate_presale.pdf':'PDFTemplate.pdf';
+  let existingPdfBytes = fs.readFileSync(url);
+  
+  const pdfDoc = await PDFDocument.load(existingPdfBytes)
+  const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+
+  const pages = pdfDoc.getPages()
+  const firstPage = pages[0]
+  const { width, height } = firstPage.getSize()
+
+  firstPage.drawText(fields.investAmount, {
+    x: 167,
+    y: 672,
+    size: 12,
+    font: helveticaFont,
+    color: rgb(0, 0, 0)
+  })
+  firstPage.drawText(fields.investDate, {
+    x: 435,
+    y: 672,
+    size: 10,
+    font: helveticaFont,
+    color: rgb(0, 0, 0)
+  })
+
+  const nextpage = pages[4] //pdfDoc.addPage()
+  nextpage.drawText(fields.investName, {
+    x: 366,
+    y: 415,
+    size: 12,
+    font: helveticaFont,
+    color: rgb(0, 0, 0)
+  })
+  nextpage.drawText(fields.investTitle, {
+    x: 366,
+    y: 391,
+    size: 12,
+    font: helveticaFont,
+    color: rgb(0, 0, 0)
+  })
+  nextpage.drawText(fields.investEmail, {
+    x: 366,
+    y: 367,
+    size: 12,
+    font: helveticaFont,
+    color: rgb(0, 0, 0)
+  })
+
+  let pngImageBytes = fs.readFileSync(fields.signFile);
+  //const jpgImageBytes = await fetch(jpgUrl).then((res) => res.arrayBuffer())
+  //const pngImageBytes = await fetch(pngUrl).then((res) => res.arrayBuffer())
+  //const pdfDoc = await PDFDocument.create()
+
+  const pngImage = await pdfDoc.embedPng(pngImageBytes)
+  // const pngDims = pngImage.scale(0.5)
+
+  nextpage.drawImage(pngImage, {
+    x: 340,
+    y: 442,
+    width: 150,
+    height: 50,
+  })
+
+  const res = await pdfDoc.save({ dataUri: true });
+
+  var output = fields.investName + "_pdf.pdf";
+console.log("write file:" + output);
+  fs.writeFileSync("PDF/" + output, res);
+  return output;
+}
+
+
 app.post("/pdfmake", async function (req, res) {
   var form = new formidable.IncomingForm();
   form.parse(req, async function (err, fields, files) {
-    amount = fields.investAmount;
-    name = fields.investName;
-    title = fields.investTitle;
-    email = fields.investEmail;
-    date = fields.investDate;
-    presale = fields.presale;
-
     const sign = fields.investSignature;
 
     let buff = Buffer.from(sign.substr(22), 'base64');
-    signFile = "upload/" + name + "_sign.png";
-    fs.writeFileSync(signFile, buff);
+    fields.signFile = "upload/" + fields.investName + "_sign.png";
+    fs.writeFileSync(fields.signFile, buff);
 
-    await embedImages(presale);
+    let pdfFile = await editPDF(fields);
     console.log("Create pdf file:"+pdfFile);
 
-    // console.log("Sending email");
-    // SendMail();
-      
     res.json({
       status: "success",
       data: pdfFile,
@@ -207,67 +191,104 @@ app.post("/pdfmake", async function (req, res) {
   });
 });
 
-async function editDocx()
+async function editDocx(fields)
 {
   const PizZip = require("pizzip");
   const Docxtemplater = require("docxtemplater");
-  
   const fs = require("fs");
-  // const path = require("path");
-  
-  // Load the docx file as binary content
+
+  var ImageModule = require('docxtemplater-image-module-free');
+  const imageOpts = {
+      centered: false,
+      fileType:"docx",
+      getImage: function (tagValue) {
+          return fs.readFileSync(tagValue);
+      },
+      getSize: function (img, tagValue, tagName) {
+          return [150, 50];
+      },
+  };
+
   const content = fs.readFileSync(
       "DOCXTemplate.docx",
       "binary"
   );
-  
   const zip = new PizZip(content);
-  
   const doc = new Docxtemplater(zip, {
       paragraphLoop: true,
       linebreaks: true,
+      modules: [new ImageModule(imageOpts)],
   });
-  
-  // Render the document (Replace {first_name} by John, {last_name} by Doe, ...)
+
   doc.render({
-      token: "BITCOIN",
-      company: "wefund",
+      tokenName: fields.tokenName,
+      title: fields.title,
+      company: fields.company,
+      description: fields.description,
+      ecosystem: fields.ecosystem,
+      priceSeed: fields.priceSeed,
+      pricePresale: fields.pricePresale,
+      priceIDO: fields.priceIDO,
+      country: fields.country,
+      cofounderName: fields.cofounderName,
+      address: fields.address,
+      email: fields.email,
+      cofounderSignature: fields.cofounderSignFile,
+
+      purchaserSignature: "{%purchaserSignature}",
+      purchaserName: "{purchaserName}",
+      purchaserTitle: "{purchaserTitle}",
+      purchaserEmail: "{purchaserEmail}",
   });
   
   const buf = doc.getZip().generate({
       type: "nodebuffer",
-      // compression: DEFLATE adds a compression step.
-      // For a 50MB output document, expect 500ms additional CPU time
       compression: "DEFLATE",
   });
   
-  // buf is a nodejs Buffer, you can either write it to a file or res.send it with express for example.
-  fs.writeFileSync("output.docx", buf);
+  var output = fields.title + "_SAFT.docx"
+  fs.writeFileSync("DOCX/" + output, buf);
+  return output;
 }
 
 app.post("/docxmake", async function (req, res) {
   var form = new formidable.IncomingForm();
   form.parse(req, async function (err, fields, files) {
-    amount = fields.investAmount;
-    name = fields.investName;
-    title = fields.investTitle;
-    email = fields.investEmail;
-    date = fields.investDate;
-    presale = fields.presale;
 
-    const sign = fields.investSignature;
-
-    let buff = Buffer.from(sign.substr(22), 'base64');
-    signFile = "upload/" + name + "_sign.png";
-    fs.writeFileSync(signFile, buff);
-
-    editDocx();
-    console.log("Create word file:"+pdfFile);
+  if(typeof files.file === 'undefined' || files.file == {})
+  {
+    fields.cofounderSignFile = 'empty.png';
+    let docxFile = await editDocx(fields);
+    console.log("Create word file:" + docxFile);
 
     res.json({
       status: "success",
-      data: pdfFile,
+      data: docxFile,
+    });    
+  } else {
+    var oldpath = files.file.filepath;
+    fields.cofounderSignFile = "upload/" + fields.cofounderName + "_sign.png";
+
+    var source = fs.createReadStream(oldpath);
+    var dest = fs.createWriteStream(fields.cofounderSignFile);
+
+    source.pipe(dest);
+    source.on('end', async function() {
+      let docxFile = await editDocx(fields);
+      console.log("Create word file:" + docxFile);
+
+      res.json({
+        status: "success",
+        data: docxFile,
+      });
     });
+    source.on('error', function(err) { console.log("move error") });
+  }
+    // const sign = fields.cofounderSignature;
+    // let buff = Buffer.from(sign.substr(22), 'base64');
+
+    // fields.cofounderSignFile = "upload/" + fields.cofounderName.replace(/ /g,'') + "_sign.png";
+    // fs.writeFileSync(fields.cofounderSignFile, buff);
   });
 });
 
@@ -275,7 +296,7 @@ app.post("/uploadWhitepaper", async function (req, res) {
   var form = new formidable.IncomingForm();
   form.parse(req, async function (err, fields, files) {
     var oldpath = files.file.filepath;
-    var newFilename = fields.projectName + "_whitepaper_" + files.file.originalFilename;
+    var newFilename = fields.title + "_whitepaper_" + files.file.originalFilename;
     let newpath = "upload/" + newFilename;
 
     var source = fs.createReadStream(oldpath);
@@ -296,7 +317,7 @@ app.post("/uploadLogo", async function (req, res) {
   var form = new formidable.IncomingForm();
   form.parse(req, async function (err, fields, files) {
     var oldpath = files.file.filepath;
-    var newFilename = fields.projectName + "_logo_" + files.file.originalFilename;
+    var newFilename = fields.title + "_logo_" + files.file.originalFilename;
     let newpath = "upload/" + newFilename;
 
     var source = fs.createReadStream(oldpath);
@@ -313,32 +334,19 @@ app.post("/uploadLogo", async function (req, res) {
     source.on('error', function(err) { console.log("move error") });
   });
 });
-app.post("/uploadSAFT", async function (req, res) {
-  var form = new formidable.IncomingForm();
-  form.parse(req, async function (err, fields, files) {
-    var oldpath = files.file.filepath;
-    var newFilename = fields.projectName + "_SAFT_" + files.file.originalFilename;
-    let newpath = "upload/" + newFilename;
-
-    var source = fs.createReadStream(oldpath);
-    var dest = fs.createWriteStream(newpath);
-    
-    source.pipe(dest);
-    source.on('end', async function() {
-      console.log("SAFT upload" + newpath);
-      res.json({
-        status: "success",
-        data: newFilename,
-      });
-    });
-    source.on('error', function(err) { console.log("move error") });
-  });
-});
 
 app.get("/download_pdf", (req, res) => {
   const file = req.query.filename;
 
   var filePath = path.join(__dirname, `PDF/${file}`);
+  console.log(filePath);
+  res.download(filePath);
+});
+
+app.get("/download_docx", (req, res) => {
+  const file = req.query.filename;
+
+  var filePath = path.join(__dirname, `DOCX/${file}`);
   console.log(filePath);
   res.download(filePath);
 });
