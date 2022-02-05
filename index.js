@@ -191,7 +191,7 @@ app.post("/pdfmake", async function (req, res) {
   });
 });
 
-async function editDocx(fields)
+async function editDocxTemplate(fields)
 {
   const PizZip = require("pizzip");
   const Docxtemplater = require("docxtemplater");
@@ -239,6 +239,8 @@ async function editDocx(fields)
       purchaserName: "{purchaserName}",
       purchaserTitle: "{purchaserTitle}",
       purchaserEmail: "{purchaserEmail}",
+      purchaserAmount: "{purchaserAmount}",
+      purchaserDate: "{purchaserDate}"
   });
   
   const buf = doc.getZip().generate({
@@ -251,7 +253,7 @@ async function editDocx(fields)
   return output;
 }
 
-app.post("/docxmake", async function (req, res) {
+app.post("/docxtemplatemake", async function (req, res) {
   var form = new formidable.IncomingForm();
   form.parse(req, async function (err, fields, files) {
 
@@ -274,7 +276,7 @@ app.post("/docxmake", async function (req, res) {
 
     source.pipe(dest);
     source.on('end', async function() {
-      let docxFile = await editDocx(fields);
+      let docxFile = await editDocxTemplate(fields);
       console.log("Create word file:" + docxFile);
 
       res.json({
@@ -284,11 +286,73 @@ app.post("/docxmake", async function (req, res) {
     });
     source.on('error', function(err) { console.log("move error") });
   }
-    // const sign = fields.cofounderSignature;
-    // let buff = Buffer.from(sign.substr(22), 'base64');
+  });
+});
 
-    // fields.cofounderSignFile = "upload/" + fields.cofounderName.replace(/ /g,'') + "_sign.png";
-    // fs.writeFileSync(fields.cofounderSignFile, buff);
+async function editDocx(fields)
+{
+  const PizZip = require("pizzip");
+  const Docxtemplater = require("docxtemplater");
+  const fs = require("fs");
+
+  var ImageModule = require('docxtemplater-image-module-free');
+  const imageOpts = {
+      centered: false,
+      fileType:"docx",
+      getImage: function (tagValue) {
+          return fs.readFileSync(tagValue);
+      },
+      getSize: function (img, tagValue, tagName) {
+          return [150, 50];
+      },
+  };
+
+  const content = fs.readFileSync(
+      "DOCX/" + fields.docxTemplate,
+      "binary"
+  );
+  const zip = new PizZip(content);
+  const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true,
+      modules: [new ImageModule(imageOpts)],
+  });
+
+  doc.render({
+      purchaserSignature: fields.purchaserSignFile,
+      purchaserName: fields.purchaserName,
+      purchaserTitle: fields.purchaserTitle,
+      purchaserEmail: fields.purchaserEmail,
+      purchaserAmount: fields.purchaserAmount,
+      purchaserDate: fields.purchaserDate
+  });
+  
+  const buf = doc.getZip().generate({
+      type: "nodebuffer",
+      compression: "DEFLATE",
+  });
+  
+  var output = fields.purchaserName + "_SAFT_COMPLETED.docx"
+  fs.writeFileSync("DOCX/" + output, buf);
+  return output;
+}
+
+app.post("/docxmake", async function (req, res) {
+  var form = new formidable.IncomingForm();
+  form.parse(req, async function (err, fields, files) {
+    const sign = fields.purchaserSignature;
+    let buff = Buffer.from(sign.substr(22), 'base64');
+
+    fields.purchaserSignFile = "upload/" + fields.purchaserName.replace(/ /g,'') + "_sign.png";
+    fs.writeFileSync(fields.purchaserSignFile, buff);
+
+    let docxFile = await editDocx(fields);
+    console.log("Create Completed SAFT file:" + docxFile);
+
+    res.json({
+      status: "success",
+      data: docxFile,
+    });
   });
 });
 
