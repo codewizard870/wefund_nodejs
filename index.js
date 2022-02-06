@@ -4,14 +4,14 @@ const { PDFDocument,StandardFonts,rgb,degrees } =  require('pdf-lib');
 const nodemailer = require("nodemailer");
 const express = require("express");
 const app = express();
-const cors = require("cors");
+// const cors = require("cors");
 const fs = require('fs');
 const path = require("path")
 var formidable = require('formidable');
 
 // middleware
 app.use(express.json());
-app.use(cors());
+// app.use(cors());
 
 let serverPath = "https://wefund-nodejs-hmcl7.ondigitalocean.app";
 
