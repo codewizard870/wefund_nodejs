@@ -260,7 +260,7 @@ app.post("/docxtemplatemake", async function (req, res) {
   if(typeof files.file === 'undefined' || files.file == {})
   {
     fields.cofounderSignFile = 'empty.png';
-    let docxFile = await editDocx(fields);
+    let docxFile = await editDocxTemplate(fields);
     console.log("Create word file:" + docxFile);
 
     res.json({
