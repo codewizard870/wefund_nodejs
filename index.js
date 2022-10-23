@@ -158,7 +158,7 @@ async function editPDF(fields) {
 
   nextpage.drawImage(pngImage, {
     x: 340,
-    y: 442,
+    y: 452,
     width: 150,
     height: 50,
   })
