@@ -112,14 +112,14 @@ async function editPDF(fields) {
 
   firstPage.drawText(fields.investAmount, {
     x: 167,
-    y: 672,
+    y: 652,
     size: 12,
     font: helveticaFont,
     color: rgb(0, 0, 0)
   })
   firstPage.drawText(fields.investDate, {
     x: 435,
-    y: 672,
+    y: 652,
     size: 10,
     font: helveticaFont,
     color: rgb(0, 0, 0)
@@ -128,21 +128,21 @@ async function editPDF(fields) {
   const nextpage = pages[4] //pdfDoc.addPage()
   nextpage.drawText(fields.investName, {
     x: 366,
-    y: 415,
+    y: 425,
     size: 12,
     font: helveticaFont,
     color: rgb(0, 0, 0)
   })
   nextpage.drawText(fields.investTitle, {
     x: 366,
-    y: 391,
+    y: 401,
     size: 12,
     font: helveticaFont,
     color: rgb(0, 0, 0)
   })
   nextpage.drawText(fields.investEmail, {
     x: 366,
-    y: 367,
+    y: 377,
     size: 12,
     font: helveticaFont,
     color: rgb(0, 0, 0)
