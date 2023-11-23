@@ -1,7 +1,6 @@
 const port = process.env.PORT || 3001
 
 const { PDFDocument,StandardFonts,rgb,degrees } =  require('pdf-lib');
-const nodemailer = require("nodemailer");
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -12,91 +11,6 @@ var formidable = require('formidable');
 // middleware
 app.use(express.json());
 app.use(cors());
-
-let serverPath = "https://wefund-nodejs-hmcl7.ondigitalocean.app";
-
-function SendMail(){
-  const htmlEmail = `
-    <h3>Contact Details</h3>
-    <h1><a href="${serverPath}/download_pdf?filename=${pdfFile}">Cllick to see your pdf</a></h1>
-    <h3>Message</h3>
-    <p>Testing</p>
-    `
-  let mailOptions = {
-    from: `markovitez090@gmail.com`,
-    to: email,
-    subject: 'Message from: WefundOfficial',
-    html: htmlEmail,
-    };
-
-  // let transporter = nodemailer.createTransport({
-  //   // service: "gmail",
-  //   host: 'smtp.gmail.com',
-  //   port:587, 
-  //   secure: true,
-  //   // requireTLS: true,
-  //   // service: 'gmail',
-  //   auth: {
-  //   // type: "OAuth2",
-  //   user: "jameszook0902@gmail.com",
-  //   pass: "ypsecskymkiccmxa",
-  //   // clientId: '958471293842-kipnnfth137ajici3iuka6a92ltbn64e.apps.googleusercontent.com',
-  //   // clientSecret: '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',
-  //   // refreshToken: process.env.OAUTH_REFRESH_TOKEN,
-  //   },
-  //   // tls: {rejectUnauthorized: false}
-  // });
-
-//   let transporter = nodemailer.createTransport({
-// //name: "example.com",
-//     host: "smtp.gmail.com",
-//     port: 587,
-//     secure: false, // use TLS
-//     auth: {
-//       user: "markovitez090@gmail.com",
-//       pass: "MarkoVitez090!",
-//     },
-//     tls: {
-//       // do not fail on invalid certs
-//       rejectUnauthorized: false,
-//     },
-//   });
-
-// transporter.verify(function (error, success) {
-//   if (error) {
-//     console.log(error);
-//   } else {
-//     console.log("Server is ready to take our messages");
-//   }
-// });
-
-//   console.log(mailOptions);
-
-//   transporter.sendMail(mailOptions, function (err, data) {
-//     if (err) {
-//         console.log(err)
-//         return false;
-//     } else {
-//         console.log("== Message Sent ==");
-//         return true;
-//     }
-//   });
-
-  const apiKey = 'cac494aa-8e59be49';
-  const domain = 'mailer.wefund.app';
-
-  const mailgun = require('mailgun-js')({ domain, apiKey });
-
-  mailgun.messages()
-    .send({
-      from: `wefundofficial@gmail.com`,
-        to: 'alenzer0902@gmail.com',
-        subject: 'Hello from Mailgun',
-        text: 'This is a test'
-    })
-    .then(res => console.log(res))
-    .catch(err => console.log(err));
-}
 
 async function editPDF(fields) {
 
@@ -170,7 +84,6 @@ console.log("write file:" + output);
   fs.writeFileSync("PDF/" + output, res);
   return output;
 }
-
 
 app.post("/pdfmake", async function (req, res) {
   var form = new formidable.IncomingForm();
@@ -477,10 +390,6 @@ console.log("Connected!");
     });
   });
 })
-// const port = 3001;
-// app.listen(port, () => {
-//   console.log(`Server is running on port: ${port}`);
-// });
 
 app.get('/', (req, res) => res.send("success"))
 
